@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#11110f">
+    <meta
+      name="description"
+      content="Случайные вопросы для тёплых, глубоких и по-настоящему интересных разговоров."
+    >
+    <title>Душевные вопросы — место для настоящего разговора</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Georgia, "Times New Roman", serif;
+        background: #11110f;
+        color: #f3efe6;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        --muted: #a7a196;
+        --accent: #d7b986;
+        --surface: #191916;
+        --line: rgb(243 239 230 / 12%);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-width: 320px;
+        min-height: 100vh;
+        margin: 0;
+        display: grid;
+        place-items: center;
+        padding: 48px 24px;
+        background:
+          radial-gradient(ellipse at 50% 42%, rgb(91 75 49 / 14%), transparent 58%),
+          #11110f;
+      }
+
+      button {
+        font: inherit;
+      }
+
+      .page {
+        width: min(100%, 760px);
+        margin: auto;
+        text-align: center;
+      }
+
+      .ornament {
+        display: inline-grid;
+        width: 44px;
+        height: 44px;
+        place-items: center;
+        margin-bottom: 24px;
+        border: 1px solid rgb(215 185 134 / 35%);
+        border-radius: 50%;
+        color: var(--accent);
+        font-size: 19px;
+      }
+
+      .eyebrow {
+        margin: 0 0 14px;
+        color: var(--accent);
+        font-family: Arial, sans-serif;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(42px, 8vw, 72px);
+        font-weight: 400;
+        letter-spacing: -0.055em;
+        line-height: 1.06;
+      }
+
+      .intro {
+        margin: 18px 0 38px;
+        color: var(--muted);
+        font-size: clamp(15px, 2.5vw, 18px);
+        line-height: 1.7;
+      }
+
+      .categories {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 9px;
+        margin: 0 0 24px;
+      }
+
+      .category {
+        padding: 10px 17px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: transparent;
+        color: #c1bcb1;
+        cursor: pointer;
+        font-size: 14px;
+        transition:
+          color 180ms ease,
+          background 180ms ease,
+          border-color 180ms ease,
+          transform 180ms ease;
+      }
+
+      .category:hover {
+        transform: translateY(-2px);
+        border-color: rgb(215 185 134 / 55%);
+        color: #f3efe6;
+      }
+
+      .category[aria-pressed="true"] {
+        border-color: var(--accent);
+        background: var(--accent);
+        color: #1b1915;
+      }
+
+      .category:focus-visible,
+      .next:focus-visible {
+        outline: 2px solid #f3efe6;
+        outline-offset: 4px;
+      }
+
+      .question-card {
+        position: relative;
+        display: grid;
+        min-height: 264px;
+        place-items: center;
+        overflow: hidden;
+        padding: 42px clamp(24px, 7vw, 64px);
+        border: 1px solid rgb(243 239 230 / 9%);
+        border-radius: 4px;
+        background: linear-gradient(145deg, #1d1c18, #171714 72%);
+        box-shadow:
+          0 32px 80px rgb(0 0 0 / 46%),
+          0 8px 24px rgb(0 0 0 / 25%),
+          inset 0 1px rgb(255 255 255 / 3%);
+      }
+
+      .question-card::before,
+      .question-card::after {
+        position: absolute;
+        width: 56px;
+        height: 56px;
+        border-color: rgb(215 185 134 / 32%);
+        border-style: solid;
+        content: "";
+        pointer-events: none;
+      }
+
+      .question-card::before {
+        top: 14px;
+        left: 14px;
+        border-width: 1px 0 0 1px;
+      }
+
+      .question-card::after {
+        right: 14px;
+        bottom: 14px;
+        border-width: 0 1px 1px 0;
+      }
+
+      .question-inner {
+        width: 100%;
+      }
+
+      .question-number {
+        display: block;
+        margin-bottom: 20px;
+        color: var(--accent);
+        font-size: 14px;
+        letter-spacing: 0.12em;
+      }
+
+      .question-text {
+        margin: 0;
+        font-size: clamp(24px, 4.8vw, 36px);
+        font-weight: 400;
+        line-height: 1.42;
+        text-wrap: balance;
+      }
+
+      .question-hint {
+        margin: 16px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      .question-text.is-changing {
+        animation: question-fade 420ms ease both;
+      }
+
+      @keyframes question-fade {
+        from {
+          transform: translateY(8px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .next {
+        display: inline-flex;
+        min-height: 52px;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 26px;
+        padding: 0 25px;
+        border: 1px solid var(--accent);
+        border-radius: 2px;
+        background: var(--accent);
+        color: #1b1915;
+        cursor: pointer;
+        font-size: 15px;
+        transition:
+          transform 180ms ease,
+          background 180ms ease,
+          box-shadow 180ms ease;
+      }
+
+      .next:hover {
+        transform: translateY(-2px);
+        background: #e5cca0;
+        box-shadow: 0 10px 28px rgb(215 185 134 / 17%);
+      }
+
+      .next:active {
+        transform: translateY(0);
+      }
+
+      .next-arrow {
+        font-size: 19px;
+        line-height: 1;
+        transition: transform 180ms ease;
+      }
+
+      .next:hover .next-arrow {
+        transform: translateX(3px);
+      }
+
+      .counter {
+        margin: 22px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .counter strong {
+        color: #e5dfd3;
+        font-weight: 400;
+      }
+
+      footer {
+        margin-top: 54px;
+        color: #706c63;
+        font-size: 12px;
+        letter-spacing: 0.04em;
+      }
+
+      @media (max-width: 520px) {
+        body {
+          padding: 34px 18px;
+        }
+
+        .intro {
+          margin-bottom: 30px;
+        }
+
+        .categories {
+          gap: 8px;
+        }
+
+        .category {
+          padding: 9px 13px;
+          font-size: 13px;
+        }
+
+        .question-card {
+          min-height: 248px;
+          padding: 38px 26px;
+        }
+
+        footer {
+          margin-top: 42px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <div class="ornament" aria-hidden="true">✳</div>
+      <p class="eyebrow">Место для настоящего разговора</p>
+      <h1>Душевные вопросы</h1>
+      <p class="intro">Иногда один хороший вопрос — это начало близости.</p>
+
+      <div class="categories" role="group" aria-label="Категория вопросов">
+        <button class="category" type="button" data-category="all" aria-pressed="true">Все</button>
+        <button class="category" type="button" data-category="light" aria-pressed="false">Лёгкие</button>
+        <button class="category" type="button" data-category="deep" aria-pressed="false">Глубокие</button>
+        <button class="category" type="button" data-category="get-to-know" aria-pressed="false">Для знакомства</button>
+      </div>
+
+      <section class="question-card" aria-label="Случайный вопрос">
+        <div class="question-inner">
+          <span class="question-number" id="question-number">#--</span>
+          <p class="question-text" id="question-text" aria-live="polite">
+            Какой вопрос тебе хотелось бы услышать сегодня?
+          </p>
+          <p class="question-hint" id="question-hint">Выбери категорию и начни разговор</p>
+        </div>
+      </section>
+
+      <button class="next" id="next-question" type="button">
+        Следующий вопрос <span class="next-arrow" aria-hidden="true">→</span>
+      </button>
+      <p class="counter" aria-live="polite">Задано вопросов: <strong id="question-count">0</strong></p>
+      <footer>Без спешки. С интересом друг к другу.</footer>
+    </main>
+
+    <script>
+      const questions = {
+        light: [
+          "Какой маленький момент сегодня уже успел тебя порадовать?",
+          "Какой запах мгновенно переносит тебя в приятное воспоминание?",
+          "Если бы сегодняшний вечер был фильмом, как бы он назывался?",
+          "Какое блюдо ты мог бы есть хоть каждую неделю?",
+          "Какую песню ты всегда рад услышать?",
+          "Какое место в городе ты любишь показывать друзьям?",
+          "Какой самый уютный способ провести дождливый день?",
+          "Какую суперспособность ты бы выбрал на один день?"
+        ],
+        deep: [
+          "Какой свой выбор ты понимаешь лучше всего только сейчас?",
+          "Что для тебя значит чувствовать себя по-настоящему дома?",
+          "Какое качество в людях помогает тебе им доверять?",
+          "О чём ты мечтаешь, но редко говоришь вслух?",
+          "В какие моменты ты чувствуешь себя наиболее настоящим?",
+          "Какое убеждение со временем изменилось у тебя сильнее всего?",
+          "Что бы ты хотел научиться принимать в себе?",
+          "Как ты понимаешь, что живёшь именно своей жизнью?"
+        ],
+        "get-to-know": [
+          "Чему новому ты в последнее время научился — случайно или намеренно?",
+          "Как выглядит твой идеальный выходной?",
+          "Какое занятие помогает тебе перезагрузиться?",
+          "Какое путешествие запомнилось тебе больше всего и почему?",
+          "Что тебя обычно вдохновляет, когда идеи заканчиваются?",
+          "Какой навык ты хотел бы однажды освоить?",
+          "Что люди часто удивляются узнать о тебе?",
+          "С кем из исторических личностей ты бы с удовольствием поужинал?"
+        ]
+      };
+
+      const categoryButtons = document.querySelectorAll(".category");
+      const questionNumber = document.querySelector("#question-number");
+      const questionText = document.querySelector("#question-text");
+      const questionHint = document.querySelector("#question-hint");
+      const questionCount = document.querySelector("#question-count");
+      const nextButton = document.querySelector("#next-question");
+
+      let selectedCategory = "all";
+      let previousQuestion = "";
+      let askedCount = 0;
+
+      categoryButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          selectedCategory = button.dataset.category;
+          categoryButtons.forEach((categoryButton) => {
+            categoryButton.setAttribute(
+              "aria-pressed",
+              String(categoryButton === button)
+            );
+          });
+        });
+      });
+
+      nextButton.addEventListener("click", () => {
+        const availableQuestions = selectedCategory === "all"
+          ? Object.values(questions).flat()
+          : questions[selectedCategory];
+        const choices = availableQuestions.filter(
+          (question) => question !== previousQuestion
+        );
+        const question = choices[Math.floor(Math.random() * choices.length)];
+
+        previousQuestion = question;
+        askedCount += 1;
+        questionNumber.textContent = `#${String(askedCount).padStart(2, "0")}`;
+        questionCount.textContent = String(askedCount);
+        questionHint.textContent = "Не торопись с ответом";
+        questionText.classList.remove("is-changing");
+        questionText.textContent = question;
+        requestAnimationFrame(() => questionText.classList.add("is-changing"));
+      });
+    </script>
+  </body>
+</html>
